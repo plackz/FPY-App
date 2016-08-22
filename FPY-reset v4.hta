@@ -1,0 +1,143 @@
+<head>
+<title>FPY Reset</title>
+<HTA:APPLICATION 
+     APPLICATIONNAME="HTA Test"
+     SCROLL="yes"
+     SINGLEINSTANCE="yes"
+     'WINDOWSTATE="maximize"
+>
+
+'++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+'+ Program written in HTA (HTML Application). Basically a MS GUI for VB Script
+'+ 8/18/2016
+'+
+'+ by: Peter Zaffina
+'+ pzaffina@slb.com
+'++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+<head>
+<title>Reset FPY</title>
+<HTA:APPLICATION 
+     APPLICATIONNAME="Operating System Version"
+     SCROLL="yes"
+     SINGLEINSTANCE="yes"
+>
+<style>
+    body {
+        background-color: white;
+        /* font-family: "Gerogia", Georgia, serif; */
+        font-family: "Arial", Arial, sans-serif;
+    
+    }
+
+    h1 {
+        color: #003366;
+        margin-left: 20px;
+        font-size: 40px;
+        
+    }
+    
+    p {
+        font: bold;
+        font-size: 20px;
+        
+    }
+    
+</style>
+
+</head>
+
+<script language="VBScript">
+    
+    window.resizeTo 600,280
+
+  
+    Sub ButtonPush
+
+        AddRecord
+
+        SwitchDB    
+
+    End Sub
+    
+    Sub SwitchDB
+        Set oApp = GetObject(,"Access.Application")
+        oApp.CloseCurrentDatabase
+        oApp.OpenCurrentDatabase "\\okcpfs01vh\Shared\unsecured\ManufacturingCommunicationDataSystem\Assembly - MDC.accdb"
+        set oApp=nothing
+       
+    End Sub
+    
+    Sub RebootCPU
+        strComputer = "." ' Local Computer
+
+        SET objWMIService = GETOBJECT("winmgmts:{impersonationLevel=impersonate,(Shutdown)}!\\" & _
+			                 strComputer & "\root\cimv2")
+
+        SET colOS = objWMIService.ExecQuery("Select * from Win32_OperatingSystem")
+
+        FOR EACH objOS in colOS
+	           objOS.Reboot()
+        NEXT
+    
+    End Sub
+    
+    Sub AddRecord
+        Const ForAppending = 8
+
+        Set objFSO = CreateObject("Scripting.FileSystemObject")
+
+        Set objFile = objFSO.OpenTextFile("\\okcpfs01vh\Shared\unsecured\QUALITY\Projects\FPY Reset Button\FPYIssuesLog.txt", ForAppending)
+    
+        Set WshNetwork = CreateObject("WScript.Network")
+        
+        objFile.Write WshNetwork.ComputerName
+        
+        objFile.Write "; FPY-Reset; " & Now & vbCrLf
+        
+        objFile.Close    
+        
+    End Sub
+    
+</script>
+    
+<body>
+<h1><img src="images/bluelogo_large.jpg" alt="Schlumberger corporate logo" style="float:right;width:159px;height:36px;">FPY Reset Button</h1>
+<p>Issues with the FPY program? Press this button to reset. </p>
+    <input type="button" value="Reset FPY Database" name="run_button"  onClick="ButtonPush" 
+       style="
+        background-color: #003366;
+        border: none;
+        color: white;
+        padding: 15px 15px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        font: bold;      
+
+">
+<p>
+    
+</p>
+    
+<p>If the computer is frozen please reboot. </p>
+    
+    <!--
+    
+<input type="button" value="Restart Computer" name="run_button"  onClick="RebootCPU"
+       style="
+        background-color: #003366;
+        border: none;
+        color: white;
+        padding: 15px 29px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        font: bold;       
+">
+
+-->
+    
+</body>
